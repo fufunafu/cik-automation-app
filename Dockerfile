@@ -22,8 +22,8 @@ RUN curl -fsSL https://dl.google.com/linux/linux_signing_key.pub | gpg --dearmor
     echo "deb [arch=amd64 signed-by=/usr/share/keyrings/google.gpg] http://dl.google.com/linux/chrome/deb/ stable main" > /etc/apt/sources.list.d/google.list && \
     apt-get update && apt-get install -y google-chrome-stable
 
-# Install ChromeDriver (FIXED version)
-RUN CHROMEDRIVER_VERSION=124.0.6367.91 && \
+# Install ChromeDriver (working version)
+RUN CHROMEDRIVER_VERSION=124.0.6367.118 && \
     wget -O /tmp/chromedriver.zip "https://chromedriver.storage.googleapis.com/${CHROMEDRIVER_VERSION}/chromedriver_linux64.zip" && \
     unzip /tmp/chromedriver.zip -d /usr/local/bin/ && \
     chmod +x /usr/local/bin/chromedriver
