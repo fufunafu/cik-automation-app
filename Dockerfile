@@ -23,10 +23,12 @@ RUN curl -fsSL https://dl.google.com/linux/linux_signing_key.pub | gpg --dearmor
     apt-get update && apt-get install -y google-chrome-stable
 
 # Install ChromeDriver (working version)
-RUN CHROMEDRIVER_VERSION=124.0.6367.118 && \
+# Install ChromeDriver version 114.0.5735.90
+RUN CHROMEDRIVER_VERSION=114.0.5735.90 && \
     wget -O /tmp/chromedriver.zip "https://chromedriver.storage.googleapis.com/${CHROMEDRIVER_VERSION}/chromedriver_linux64.zip" && \
     unzip /tmp/chromedriver.zip -d /usr/local/bin/ && \
     chmod +x /usr/local/bin/chromedriver
+
 
 # Set display port (Selenium needs it)
 ENV DISPLAY=:99
