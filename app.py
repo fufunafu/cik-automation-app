@@ -45,7 +45,7 @@ def run_automation():
     chrome_options.add_experimental_option("useAutomationExtension", False)
     chrome_options.add_argument("user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/137 Safari/537.36")
 
-    driver = webdriver.Chrome(service=Service("/opt/homebrew/bin/chromedriver"), options=chrome_options)
+    driver = webdriver.Chrome(options=chrome_options)
 
     try:
         wait = WebDriverWait(driver, 15)
