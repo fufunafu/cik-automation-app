@@ -31,4 +31,17 @@ RUN CHROMEDRIVER_VERSION=114.0.5735.90 && \
 
 
 # Set display port (Selenium needs it)
-ENV
+ENV DISPLAY=:99
+
+# Install Python dependencies
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Copy app code
+COPY . .
+
+# Expose the port Flask runs on
+EXPOSE 5001
+
+# Start your app
+CMD ["gunicorn", "--bind", "0.0.0.0:5001", "app:app"]
