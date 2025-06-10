@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CIK Automation Dashboard</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet" />
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          keyframes: {
+            spin: {
+              '0%': { transform: 'rotate(0deg)' },
+              '100%': { transform: 'rotate(360deg)' },
+            },
+          }
+        }
+      }
+    };
+  </script>
+</head>
+<body class="bg-gray-100 min-h-screen flex items-center justify-center p-6">
+
+  <div class="bg-white w-full max-w-3xl rounded-2xl shadow-xl overflow-hidden">
+    <!-- Header -->
+    <div class="bg-blue-600 text-white p-6 flex justify-between items-center">
+      <h1 class="text-2xl font-bold">CIK Automation Dashboard</h1>
+      <span class="text-sm opacity-75">2025 © CIK Tools Inc.</span>
+    </div>
+
+    <!-- Step Navigation -->
+    <div class="bg-gray-100 px-6 py-4 flex gap-4 text-sm font-medium text-gray-600">
+      <div class="step active">Step 1: Instructions</div>
+      <div class="step">Step 2: Run Automation</div>
+      <div class="step">Step 3: Results</div>
+    </div>
+
+    <!-- Content -->
+    <div id="content" class="p-6 space-y-4">
+      <!-- Step 1 -->
+      <div id="step-1">
+        <h2 class="text-xl font-semibold text-gray-800">Getting Started</h2>
+        <p class="text-gray-600">
+          This tool automates the collection and logging of CIK activity logs. Click "Next" to begin the automation process.
+        </p>
+        <button 
+          onclick="nextStep()" 
+          class="mt-4 bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-xl transition"
+        >
+          Next
+        </button>
+      </div>
+
+      <!-- Step 2 -->
+      <div id="step-2" class="hidden">
+        <h2 class="text-xl font-semibold text-gray-800 mb-2">Run Automation</h2>
+        <p class="text-gray-600 mb-4">Click below to start the automation. Please wait while the process completes.</p>
+        <form action="/run_automation" method="POST" onsubmit="showLoader()" class="flex flex-col items-center">
+          <button 
+            type="submit" 
+            id="run-btn"
+            class="bg-green-600 hover:bg-green-700 text-white text-lg px-6 py-3 rounded-xl shadow-md flex items-center gap-2"
+          >
+            <i class="fas fa-play"></i>
+            Run Automation
+          </button>
+          <!-- Loader hidden by default -->
+          <div id="loader" class="hidden mt-4 text-blue-600">
+            <i class="fas fa-spinner fa-spin text-2xl"></i>
+            <p class="mt-2 text-sm">Automation in progress...</p>
+          </div>
+        </form>
+      </div>
+
+      <!-- Step 3 -->
+
+        <div id="step-3" class="hidden text-left space-y-3 px-2">
+            <h2 class="text-xl font-semibold text-gray-800">Automation Results</h2>
+            <div id="result-summary" class="text-gray-700 text-sm space-y-1">
+                <div id="loading-results-msg" class="text-blue-500 text-sm flex items-center gap-2">
+                    <i class="fas fa-spinner fa-spin"></i>
+                    <span>Processing data... this may take 10–20 seconds depending on volume.</span>
+                  </div>
+                  
+                  <div id="results-container" class="hidden space-y-1"></div>                  
+            </div>
+        
+            <div class="mt-6 space-y-2 text-center">
+            <a href="/" class="inline-block text-blue-600 text-sm hover:underline">← Run another automation</a>
+            </div>
+        </div>
+        
+  
+    </div>
+  </div>
+
+  <script>
+    let currentStep = 1;
+  
+    function nextStep() {
+      document.getElementById(`step-${currentStep}`).classList.add("hidden");
+      currentStep++;
+      document.getElementById(`step-${currentStep}`).classList.remove("hidden");
+      updateStepIndicators();
+    }
+  
+    function updateStepIndicators() {
+      document.querySelectorAll('.step').forEach((el, idx) => {
+        el.classList.remove('text-blue-600', 'font-bold');
+        if (idx + 1 === currentStep) {
+          el.classList.add('text-blue-600', 'font-bold');
+        }
+      });
+    }
+  
+    async function runAutomation() {
+      document.getElementById("run-btn").classList.add("hidden");
+      document.getElementById("loader").classList.remove("hidden");
+      document.getElementById("error-msg").classList.add("hidden");
+  
+      try {
+        const response = await fetch("/run_automation", { method: "POST" });
+        const data = await response.json();
+  
+        document.getElementById("loader").classList.add("hidden");
+  
+        if (data.error) throw new Error(data.error);
+  
+        nextStep();
+  
+        // Show results inside Step 3
+        const resultsHTML = `
+          <p><strong>Total calls:</strong> ${data.total_calls}</p>
+          <p><strong>Missed calls:</strong> ${data.missed_calls}</p>
+          <p><strong>Voicemails:</strong> ${data.vm_calls}</p>
+          <p><strong>Missed % (excl. VM):</strong> ${data.percent_missed}%</p>
+          <p class="mt-2"><strong>Numbers needing callback:</strong></p>
+          <ul class="mt-1 list-disc pl-5 text-left">
+            ${(data.callback_needed || []).map(n =>
+              `<li>${n.missed_from} @ ${n.missed_time}</li>`
+            ).join("") || "<li>None</li>"}
+          </ul>
+        `;
+        // Hide loading message
+        document.getElementById("loading-results-msg").classList.add("hidden");
+
+        // Show result container and fill it
+        const resultContainer = document.getElementById("results-container");
+        resultContainer.classList.remove("hidden");
+        resultContainer.innerHTML = resultsHTML;
+  
+      } catch (err) {
+        document.getElementById("run-btn").classList.remove("hidden");
+        document.getElementById("loader").classList.add("hidden");
+        document.getElementById("error-msg").classList.remove("hidden");
+        document.getElementById("error-msg").textContent = `Error: ${err.message}`;
+      }
+    }
+  </script>
+  
+</body>
+</html>
