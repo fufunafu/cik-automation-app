@@ -182,46 +182,4 @@ def run_automation():
             missed_time = missed_row["end"]
             was_called_back = df_outbound[
                 (df_outbound["to"] == missed_number) &
-                (df_outbound["start"] > missed_time)
-            ]
-            if was_called_back.empty:
-                callback_needed.append({
-                    "missed_from": missed_number,
-                    "missed_time": missed_time.strftime("%Y-%m-%d %H:%M:%S"),
-                })
-
-        missed_calls_count = len(callback_needed)
-        total_calls = len(df)
-        real_missed = missed_calls_count
-        real_calls = total_calls - len(vm_calls)
-        percent_missed = (real_missed / real_calls * 100) if real_calls else 0
-
-        driver.quit()
-        callback_df = pd.DataFrame(callback_needed)
-
-        return render_template(
-            "result.html",
-            callback_df=callback_df if not callback_df.empty else None,
-            empty=callback_df.empty,
-            total_calls=total_calls,
-            missed_calls=missed_calls_count,
-            vm_calls=vm_calls_count,
-            percent_missed=percent_missed,
-            total_today=total_today,
-            missed_today=real_missed_today,
-            vm_today=today_vm_count,
-            percent_today=round(pct_missed_today, 1),
-            total_last7=len(df_last7),
-            missed_last7=real_missed_last7,
-            vm_last7=last7_vm_count,
-            percent_last7=round(pct_missed_last7, 1)
-        )
-
-    except Exception as e:
-        print("❌ Exception occurred:", e)
-        driver.quit()
-        return jsonify({"error": str(e)})
-
-if __name__ == "__main__":
-    port = int(os.environ.get("PORT", 5001))
-    app.run(host="0.0.0.0", port=port)
+                (df_outbo
