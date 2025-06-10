@@ -217,4 +217,35 @@
       <a href="/" class="btn btn-secondary">← Back to Dashboard</a>
     </div>
 
-    <p class="footer-note">Make sure to mark completed callbacks
+    <p class="footer-note">Make sure to mark completed callbacks to keep your records up to date.</p>
+  </div>
+
+  <script>
+    document.getElementById('selectAll')?.addEventListener('change', function () {
+      const checkboxes = document.querySelectorAll('.row-checkbox');
+      checkboxes.forEach(cb => cb.checked = this.checked);
+    });
+
+    function markCompleted() {
+      const selected = document.querySelectorAll('.row-checkbox:checked');
+      if (selected.length === 0) {
+        alert('⚠️ Please select at least one call to mark as completed.');
+        return;
+      }
+      selected.forEach(cb => cb.closest('tr').classList.add('table-success'));
+      alert(`✅ ${selected.length} call(s) marked as completed!`);
+    }
+
+    function searchTable() {
+      const input = document.querySelector('input[type="search"]');
+      const filter = input.value.toLowerCase();
+      const rows = document.querySelectorAll("tbody tr");
+
+      rows.forEach(row => {
+        const text = row.innerText.toLowerCase();
+        row.style.display = text.includes(filter) ? '' : 'none';
+      });
+    }
+  </script>
+</body>
+</html>
