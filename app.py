@@ -38,9 +38,15 @@ def run_automation():
         "directory_upgrade": True,
         "safebrowsing.enabled": True
     })
+    chrome_options = webdriver.ChromeOptions()
     chrome_options.add_argument("--headless=new")
     chrome_options.add_argument("--no-sandbox")
     chrome_options.add_argument("--disable-dev-shm-usage")
+    chrome_options.add_argument("--disable-gpu")
+    chrome_options.add_argument("--window-size=1920,1080")
+    chrome_options.add_argument("--disable-extensions")
+    chrome_options.add_argument("--remote-debugging-port=9222")
+    chrome_options.add_argument("--disable-software-rasterizer")
     chrome_options.add_experimental_option("excludeSwitches", ["enable-automation"])
     chrome_options.add_experimental_option("useAutomationExtension", False)
     chrome_options.add_argument("user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/137 Safari/537.36")
@@ -210,15 +216,4 @@ def run_automation():
             percent_today=round(pct_missed_today, 1),
             total_last7=len(df_last7),
             missed_last7=real_missed_last7,
-            vm_last7=last7_vm_count,
-            percent_last7=round(pct_missed_last7, 1)
-        )
-
-    except Exception as e:
-        print("❌ Exception occurred:", e)
-        driver.quit()
-        return jsonify({"error": str(e)})
-
-if __name__ == "__main__":
-    port = int(os.environ.get("PORT", 5001))
-    app.run(host="0.0.0.0", port=port)
+        

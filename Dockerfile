@@ -22,26 +22,13 @@ RUN curl -fsSL https://dl.google.com/linux/linux_signing_key.pub | gpg --dearmor
     echo "deb [arch=amd64 signed-by=/usr/share/keyrings/google.gpg] http://dl.google.com/linux/chrome/deb/ stable main" > /etc/apt/sources.list.d/google.list && \
     apt-get update && apt-get install -y google-chrome-stable
 
-# Install ChromeDriver (working version)
-# Install ChromeDriver version 114.0.5735.90
-RUN CHROMEDRIVER_VERSION=114.0.5735.90 && \
-    wget -O /tmp/chromedriver.zip "https://chromedriver.storage.googleapis.com/${CHROMEDRIVER_VERSION}/chromedriver_linux64.zip" && \
+# Install ChromeDriver that matches the installed Chrome version
+RUN CHROME_VERSION=$(google-chrome --version | grep -oP '\d+\.\d+\.\d+') && \
+    echo "Detected Chrome version: $CHROME_VERSION" && \
+    CHROMEDRIVER_URL="https://edgedl.me.gvt1.com/edgedl/chrome/chrome-for-testing/${CHROME_VERSION}/linux64/chromedriver-linux64.zip" && \
+    echo "Downloading ChromeDriver from: $CHROMEDRIVER_URL" && \
+    wget -O /tmp/chromedriver.zip "$CHROMEDRIVER_URL" && \
     unzip /tmp/chromedriver.zip -d /usr/local/bin/ && \
-    chmod +x /usr/local/bin/chromedriver
-
-
-# Set display port (Selenium needs it)
-ENV DISPLAY=:99
-
-# Install Python dependencies
-COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
-
-# Copy app code
-COPY . .
-
-# Expose the port Flask runs on
-EXPOSE 5001
-
-# Start your app
-CMD ["gunicorn", "--bind", "0.0.0.0:5001", "app:app"]
+    mv /usr/local/bin/chromedriver-linux64/chromedriver /usr/local/bin/chromedriver && \
+    chmod +x /usr/local/bin/chromedriver && \
+    rm -rf /t
