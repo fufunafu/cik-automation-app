@@ -48,4 +48,4 @@ COPY . .
 EXPOSE 5001
 
 # Start your app
-CMD ["gunicorn", "--bind", "0.0.0.0:${PORT}", "app:app"]
+CMD gunicorn --bind 0.0.0.0:$PORT app:app
