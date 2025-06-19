@@ -46,7 +46,7 @@
           This tool automates the collection and logging of CIK activity logs. Click "Next" to begin the automation process.
         </p>
         <button 
-          onclick="nextStep()" 
+          id="nextBtn"
           class="mt-4 bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-xl transition"
         >
           Next
@@ -115,11 +115,30 @@
       });
     }
   
+    // Attach event listeners after DOM is loaded
+    document.addEventListener('DOMContentLoaded', function() {
+      // Next button
+      const nextBtn = document.getElementById('nextBtn');
+      if (nextBtn) {
+        nextBtn.addEventListener('click', nextStep);
+      }
+
+      // Run Automation form
+      const runForm = document.querySelector('form[action="/run_automation"]');
+      if (runForm) {
+        runForm.addEventListener('submit', function(e) {
+          document.getElementById("run-btn").classList.add("hidden");
+          document.getElementById("loader").classList.remove("hidden");
+          document.getElementById("error-msg")?.classList.add("hidden");
+        });
+      }
+    });
+
     async function runAutomation() {
       document.getElementById("run-btn").classList.add("hidden");
       document.getElementById("loader").classList.remove("hidden");
-      document.getElementById("error-msg").classList.add("hidden");
-  
+      document.getElementById("error-msg")?.classList.add("hidden");
+
       try {
         const response = await fetch("/run_automation", { method: "POST" });
         const data = await response.json();
@@ -154,7 +173,7 @@
       } catch (err) {
         document.getElementById("run-btn").classList.remove("hidden");
         document.getElementById("loader").classList.add("hidden");
-        document.getElementById("error-msg").classList.remove("hidden");
+        document.getElementById("error-msg")?.classList.remove("hidden");
         document.getElementById("error-msg").textContent = `Error: ${err.message}`;
       }
     }
