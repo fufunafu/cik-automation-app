@@ -14,6 +14,8 @@ RUN apt-get update && apt-get install -y \
     libatk-bridge2.0-0 \
     libgtk-3-0 \
     libx11-xcb1 \
+    libgbm1 \
+    libu2f-udev \
     --no-install-recommends && \
     rm -rf /var/lib/apt/lists/*
 
